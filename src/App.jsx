@@ -5,13 +5,13 @@ import { extend } from '@react-three/fiber'
 import { shaderMaterial } from '@react-three/drei'
 import glsl from 'babel-plugin-glsl/macro'
 
-// This shader is from Bruno Simons Threejs-Journey: https://threejs-journey.xyz
+
 const WaveMaterial = shaderMaterial(
   {
     time: 0,
-    colorStart: new THREE.Color('#FF0000'),
-    colorMedium: new THREE.Color('#white'),
-    colorEnd: new THREE.Color('red'),
+    colorStart: new THREE.Color('#9F3333'),
+    colorMedium: new THREE.Color('white'),
+    colorEnd: new THREE.Color('#934242'),
   },
   glsl`
       varying vec2 vUv;
@@ -23,20 +23,20 @@ const WaveMaterial = shaderMaterial(
         vUv = uv;
       }`,
   glsl`
-      #pragma glslify: cnoise3 = require(glsl-noise/classic/3d.glsl) 
+      #pragma glslify: snoise4 = require(glsl-noise/simplex/4d.glsl) 
       uniform float time;
       uniform vec3 colorStart;
       uniform vec3 colorMedium;
       uniform vec3 colorEnd;
       varying vec2 vUv;
       void main() {
-        vec2 displacedUv = vUv + cnoise3(vec3(vUv * 1.0, time * 0.05));
-        float strength = cnoise3(vec3(displacedUv * 10.0, time * 0.2));
-        float outerGlow = distance(vUv, vec2(0.5)) * 2.0 - 0.5;
-        strength += outerGlow;
-        strength += step(-0.2, strength) * 0.6;
-        strength = clamp(strength, 0.0, 1.0);
-        vec3 color = mix(colorStart,  colorEnd, strength);
+        vec2 displacedUv = vUv + snoise4(vec4(vUv *     9.0, 4.0,    time * 0.05));
+        float strength = snoise4(vec4(displacedUv *   1.0   , 1.0, time * 0.1));
+        float outerGlow = distance(vUv, vec2(0.0)) *    0.5      - 1.0;
+        strength += outerGlow *    strength;
+        strength += step(-0.1, strength) *          0.5;
+        strength = clamp(strength, 0.1, 1.0       );
+        vec3 color = mix(colorStart, colorEnd, strength);
         gl_FragColor = vec4(color, 1.0);
         #include <tonemapping_fragment>
         #include <encodings_fragment>
@@ -44,8 +44,6 @@ const WaveMaterial = shaderMaterial(
 )
 
 extend({ WaveMaterial })
-
-export { WaveMaterial }
 
 
 function ShaderPlane() {
@@ -55,7 +53,7 @@ function ShaderPlane() {
   return (
     <mesh scale={[width, height, 1]}>
       <planeGeometry />
-      <waveMaterial ref={ref} key={WaveMaterial.key} toneMapped={true} colorStart={'#FF0000'} colorMedium={'white'} colorEnd={'black'} />
+      <waveMaterial ref={ref} key={WaveMaterial.key} toneMapped={true} colorStart={'#9F3333'} colorMedium={'white'} colorEnd={'#000000'} />
     </mesh>
   )
 }
