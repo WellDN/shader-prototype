@@ -9,9 +9,8 @@ import glsl from 'babel-plugin-glsl/macro'
 const WaveMaterial = shaderMaterial(
   {
     time: 0,
-    colorStart: new THREE.Color('#9F3333'),
-    colorMedium: new THREE.Color('white'),
-    colorEnd: new THREE.Color('#934242'),
+    colorOne: new THREE.Color(),
+    colorTwo: new THREE.Color(),
   },
   glsl`
       varying vec2 vUv;
@@ -25,18 +24,18 @@ const WaveMaterial = shaderMaterial(
   glsl`
       #pragma glslify: snoise4 = require(glsl-noise/simplex/4d.glsl) 
       uniform float time;
-      uniform vec3 colorStart;
-      uniform vec3 colorMedium;
-      uniform vec3 colorEnd;
+      uniform vec3 colorOne;
+      uniform vec3 colorTwo;
       varying vec2 vUv;
       void main() {
         vec2 displacedUv = vUv + snoise4(vec4(vUv *     9.0, 4.0,    time * 0.05));
         float strength = snoise4(vec4(displacedUv *   1.0   , 1.0, time * 0.1));
         float outerGlow = distance(vUv, vec2(0.0)) *    0.5      - 1.0;
         strength += outerGlow *    strength;
-        strength += step(-0.1, strength) *          0.5;
+        strength += step(-0.1, strength) *          1.5;
         strength = clamp(strength, 0.1, 1.0       );
-        vec3 color = mix(colorStart, colorEnd, strength);
+        
+        vec3 color = mix(colorOne,  colorTwo, strength);
         gl_FragColor = vec4(color, 1.0);
         #include <tonemapping_fragment>
         #include <encodings_fragment>
@@ -53,7 +52,7 @@ function ShaderPlane() {
   return (
     <mesh scale={[width, height, 1]}>
       <planeGeometry />
-      <waveMaterial ref={ref} key={WaveMaterial.key} toneMapped={true} colorStart={'#9F3333'} colorMedium={'white'} colorEnd={'#000000'} />
+      <waveMaterial ref={ref} key={WaveMaterial.key} toneMapped={true} colorOne={'#AA2929'} colorTwo={'#000000'} />
     </mesh>
   )
 }
