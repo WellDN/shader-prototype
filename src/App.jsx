@@ -22,21 +22,20 @@ const WaveMaterial = shaderMaterial(
         vUv = uv;
       }`,
   glsl`
-      #pragma glslify: snoise4 = require(glsl-noise/simplex/4d.glsl) 
-      uniform float time;
-      uniform vec3 colorOne;
-      uniform vec3 colorTwo;
-      varying vec2 vUv;
-      void main() {
-        vec2 displacedUv = vUv + snoise4(vec4(vUv *     9.0, 4.0,    time * 0.05));
-        float strength = snoise4(vec4(displacedUv *   1.0   , 1.0, time * 0.1));
-        float outerGlow = distance(vUv, vec2(0.0)) *    0.5      - 1.0;
-        strength += outerGlow *    strength;
-        strength += step(-0.1, strength) *          1.5;
-        strength = clamp(strength, 0.1, 1.0       );
-        
-        vec3 color = mix(colorOne,  colorTwo, strength);
-        gl_FragColor = vec4(color, 1.0);
+  #pragma glslify: snoise4 = require(glsl-noise/classic/4d.glsl)
+  uniform float time;
+  uniform vec3 colorOne;
+  uniform vec3 colorTwo;
+  varying vec2 vUv;
+  void main() {
+    vec2 displacedUv = vUv + snoise4(vec4(vUv * 9.0, -5.0, time * 0.05));
+    float strength = snoise4(vec4(displacedUv - 10.0, 0.0, time * 0.2));
+    float outerGlow = distance(vUv, vec2(0.5)) * 2.0 - 0.5;
+    strength += outerGlow;
+    strength += step(-0.2, strength) * 0.6;
+    strength = clamp(strength, 0.0, 1.0);
+    vec3 color = mix(colorOne, colorTwo, strength);
+    gl_FragColor = vec4(color, 1.0);
         #include <tonemapping_fragment>
         #include <encodings_fragment>
       }`
