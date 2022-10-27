@@ -39,7 +39,8 @@ const FormlessMaterial = shaderMaterial(
         #include <tonemapping_fragment>
         #include <encodings_fragment>
       }`
-      )
+  
+    )
       //THE OBJECT IS STATIC, JUST THE COLOR THAT CHANGES
       extend({ FormlessMaterial })
       
@@ -50,7 +51,7 @@ const FormlessMaterial = shaderMaterial(
         useFrame((state, delta) => (ref.current.time += delta))
         return (
     <mesh scale={[width, height, 1]}>
-      <torusKnotBufferGeometry args={[1, 1, 19, 90, 20, 5]} />
+      <torusKnotBufferGeometry args={[1, 0.9, 19, 30, 20, 5]} />
       <MeshDistortMaterial distort={1} speed={5} />
       <formlessMaterial ref={ref} key={FormlessMaterial.key} toneMapped={true} colorOne={'#AA2929'} colorTwo={'#000000'} />
     </mesh>
