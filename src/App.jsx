@@ -22,15 +22,17 @@ const FormlessMaterial = shaderMaterial(
         vUv = uv;
       }`,
   glsl`
-      #pragma glslify: cnoise3 = require(glsl-noise/classic/3d.glsl) 
+      #pragma glslify: cnoise4 = require(glsl-noise/simplex/3d.glsl);
       uniform float time;
       uniform vec3 colorOne;
       uniform vec3 colorTwo;
       varying vec2 vUv;
       void main() {
-        vec2 displacedUv = vUv + cnoise3(vec3(vUv * 1.0, time * 0.05));
-        float strength = cnoise3(vec3(displacedUv * 10.0, time * 0.2));
-        float outerGlow = distance(vUv, vec2(0.5)) * 2.0 - 0.5;
+        vec2 displacedUv = vUv + cnoise4(vec3(vUv * 1.0, time * 0.02));
+        float strength = cnoise4(vec3(displacedUv * 10.0, time * 0.2));
+        
+        float outerGlow = distance(vUv, vec2(0.4)) * 0.1 * 0.9;
+
         strength += outerGlow;
         strength += step(-0.2, strength) * 0.6;
         strength = clamp(strength, 0.0, 1.0);
@@ -39,7 +41,6 @@ const FormlessMaterial = shaderMaterial(
         #include <tonemapping_fragment>
         #include <encodings_fragment>
       }`
-  
     )
       //THE OBJECT IS STATIC, JUST THE COLOR THAT CHANGES
       extend({ FormlessMaterial })
