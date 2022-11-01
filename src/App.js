@@ -9,9 +9,10 @@ import { VolumetricLightShader } from './shaders/VolumetricLightShader'
 const DEFAULT_LAYER = 0
 const OCCLUSION_LAYER = 1
 
-function Elf({ layer = DEFAULT_LAYER }) {
+export function Model({ layer = DEFAULT_LAYER }) {
+  
+  const { nodes, materials } = useGLTF("/hn.glb");
   const group = useRef()
-  const { nodes } = useGLTF('/scene.glb')
   const material = useMemo(() => {
     if (layer === DEFAULT_LAYER) return new THREE.MeshStandardMaterial({ color: new THREE.Color('#2a2a2a'), roughness: 1, metalness: 0.9 })
     else return new THREE.MeshBasicMaterial({ color: new THREE.Color('black') })
@@ -20,15 +21,27 @@ function Elf({ layer = DEFAULT_LAYER }) {
   useFrame(() => (group.current.rotation.y += 0.004))
 
   return (
-    <group ref={group} dispose={null}>
-      <group rotation={[-Math.PI / 2, 0, 0]} position={[0, 2, 0]}>
-        <mesh geometry={nodes.mesh_0.geometry} material={material} layers={layer} receiveShadow castShadow />
-        <mesh geometry={nodes.mesh_1.geometry} material={material} layers={layer} receiveShadow castShadow />
-        <mesh geometry={nodes.mesh_2.geometry} material={material} layers={layer} receiveShadow castShadow />
+    <group {...props} dispose={null}>
+      <group rotation={[-Math.PI / 2, 0, 0]} scale={0.07}>
+        <mesh
+          castShadow
+          receiveShadow
+          geometry={nodes.Object_2.geometry}
+          material={materials["null"]}
+        />
+        <mesh
+          castShadow
+          receiveShadow
+          geometry={nodes.Object_3.geometry}
+          material={materials["None.001"]}
+        />
       </group>
     </group>
-  )
+  );
 }
+
+useGLTF.preload("/hn.glb");
+
 
 function Post() {
   const { gl, camera, size } = useThree()
@@ -64,8 +77,8 @@ export default function App() {
       <color attach="background" args={['#050505']} />
       <Suspense fallback={null}>
         <Stage intensity={2}>
-          <Elf />
-          <Elf layer={OCCLUSION_LAYER} />
+          <Model />
+          <Model layer={OCCLUSION_LAYER} />
         </Stage>
         <Post />
       </Suspense>
