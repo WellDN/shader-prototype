@@ -1,4 +1,3 @@
-import * as THREE from 'three'
 import React, { Suspense, useRef, useMemo } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { useGLTF, useFBO, Stage, Effects } from '@react-three/drei'
@@ -10,38 +9,32 @@ const DEFAULT_LAYER = 0
 const OCCLUSION_LAYER = 1
 
 export function Model({ layer = DEFAULT_LAYER }) {
-  
-  const { nodes, materials } = useGLTF("/hn.glb");
   const group = useRef()
-  const material = useMemo(() => {
-    if (layer === DEFAULT_LAYER) return new THREE.MeshStandardMaterial({ color: new THREE.Color('#2a2a2a'), roughness: 1, metalness: 0.9 })
-    else return new THREE.MeshBasicMaterial({ color: new THREE.Color('black') })
-  }, [layer])
+  const { nodes, materials } = useGLTF("/hn.glb");
 
   useFrame(() => (group.current.rotation.y += 0.004))
 
   return (
-    <group {...props} dispose={null}>
-      <group rotation={[-Math.PI / 2, 0, 0]} scale={0.07}>
+    <group ref={group} dispose={null}>
+      <group rotation={[-Math.PI / 2, 0, 0]} position={[0, 3, 0]} scale={0.8}>
         <mesh
           castShadow
           receiveShadow
           geometry={nodes.Object_2.geometry}
           material={materials["null"]}
+          layers={layer}
         />
         <mesh
           castShadow
           receiveShadow
           geometry={nodes.Object_3.geometry}
           material={materials["None.001"]}
+          layers={layer}
         />
       </group>
     </group>
   );
 }
-
-useGLTF.preload("/hn.glb");
-
 
 function Post() {
   const { gl, camera, size } = useThree()
@@ -56,7 +49,7 @@ function Post() {
   }, 1)
   return (
     <>
-      <mesh layers={OCCLUSION_LAYER} position={[1, 12, -10]}>
+      <mesh layers={OCCLUSION_LAYER} position={[0, 12, -10]}>
         <sphereGeometry args={[4, 32, 32]} />
         <meshBasicMaterial />
       </mesh>
@@ -74,7 +67,7 @@ function Post() {
 export default function App() {
   return (
     <Canvas camera={{ position: [0, 0, 12], fov: 35 }} gl={{ antialias: false }}>
-      <color attach="background" args={['#050505']} />
+    <color attach="background" args={['#050505']} />
       <Suspense fallback={null}>
         <Stage intensity={2}>
           <Model />
