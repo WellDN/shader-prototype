@@ -1,4 +1,4 @@
-import React, { Suspense, useRef, useMemo } from 'react'
+import React, { Suspense, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { useGLTF, useFBO, Stage, Effects } from '@react-three/drei'
 import { FXAAShader } from 'three-stdlib'
@@ -8,7 +8,7 @@ import { VolumetricLightShader } from './shaders/VolumetricLightShader'
 const DEFAULT_LAYER = 0
 const OCCLUSION_LAYER = 1
 
-export function Model({ layer = DEFAULT_LAYER }) {
+function Model({ layer = DEFAULT_LAYER }) {
   const group = useRef()
   const { nodes, materials } = useGLTF("/hn.glb");
 
